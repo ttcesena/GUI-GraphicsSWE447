@@ -25,7 +25,12 @@ function Square(gl, vertexShaderId, fragmentShaderId) {
 		]),
 	numComponents = 2;
 	};
-	this.colors = { 1.0,0.0,0.0};
+	this.colors = { 
+	1.0,0.0,0.0,
+	1.0,0.0,0.0,
+	1.0,0.0,0.0,
+	1.0,0.0,0.0,
+	};
     this.indices = {
         // Add here
 	values = new Uint16Array ([ 0, 1, 3 ,2])
