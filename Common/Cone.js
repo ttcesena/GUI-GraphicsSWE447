@@ -1,6 +1,6 @@
 const DefaultNumSides = 8;
 
-function Cone( gl, numSides, vertexShaderId, fragmentShaderId ) {
+function Cone(gl, numSides, vertexShaderId, fragmentShaderId ) {
 
     // Initialize the shader pipeline for this object using either shader ids
     //   declared in the application's HTML header, or use the default names.
@@ -77,7 +77,7 @@ function Cone( gl, numSides, vertexShaderId, fragmentShaderId ) {
 
     this.render = function () {
         gl.useProgram( this.program );
-
+        
         gl.bindBuffer( gl.ARRAY_BUFFER, this.positions.buffer );
         gl.vertexAttribPointer( this.positions.attributeLoc, this.positions.numComponents,
             gl.FLOAT, gl.FALSE, 0, 0 );
@@ -87,7 +87,7 @@ function Cone( gl, numSides, vertexShaderId, fragmentShaderId ) {
         // Draw the cone's base
         //
         gl.drawElements( gl.POINTS, this.indices.count, gl.UNSIGNED_SHORT, 0 );
-
+        
         // Draw the cone's top
         //
         var offset = this.indices.count * 2 /* sizeof(UNSIGNED_INT) */;
