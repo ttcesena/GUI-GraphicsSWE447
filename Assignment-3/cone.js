@@ -13,7 +13,7 @@ function init() {
         return;
     }
     cone = new Cone(gl, 100);
-    gl.clearColor( 1.0, 0.0, 1.0, 1.0 );
+    gl.clearColor( 1.0, 0.0, 0.0, 1.0 );
 
     render();
 }
