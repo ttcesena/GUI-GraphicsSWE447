@@ -117,7 +117,7 @@ function Cube( vertexShaderId, fragmentShaderId ) {
 			handleLoadedTexture (texImage, texture);
 		}		
 		
-		texImage.src = "thanos.jpg";		
+		texImage.src = "monkey.jpg";		
 	}
 	
     
