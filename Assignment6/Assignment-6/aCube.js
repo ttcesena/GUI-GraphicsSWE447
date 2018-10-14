@@ -117,7 +117,7 @@ function Cube( vertexShaderId, fragmentShaderId ) {
 			handleLoadedTexture (texImage, texture);
 		}		
 		
-		texImage.src = "monkey.jpg";		
+		texImage.src = "monkey.png";		
 	}
 	
     
