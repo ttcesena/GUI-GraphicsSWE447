@@ -1,4 +1,3 @@
-
 Project Overview
 -I would like to do my final project on a physics based application using the Physijs addon from THREE.js. 
 Just like a carnival game, I'd like to make an application where the user would be able to throw an object, probably a ball, and knock over some other objects that are on a stand. I would also texture these objects to go along with the theme I have in mind. A stretch goal that I'd have for this would that there would be multiple levels going up in difficulty as the user progressed.
