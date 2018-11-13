@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script src="three.min.js"></script>
+	<script src="physi.js"></script>
+	<script src="tween.js"></script>
+	<script src="stats.js"></script>
+	
+	
+</head>
+
+<body>
+	<div id="viewport"></div>
+
+<script>
+	
+	'use strict';
+	
+	Physijs.scripts.worker = 'physijs_worker.js';
+	Physijs.scripts.ammo = 'ammo.js';
+
+	var initScene, render, renderer, scene, camera, table, table_material, loader;
+	
+	initScene = function() {
+		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.getElementById( 'viewport' ).appendChild( renderer.domElement );
+		
+		scene = new Physijs.Scene ({ fixedTimeStep: 1 / 120});
+		
+		camera = new THREE.PerspectiveCamera(
+			35,
+			window.innerWidth / window.innerHeight,
+			1,
+			1000
+		);
+		
+		camera = new THREE.PerspectiveCamera(
+			45,
+			window.innerWidth / window.innerHeight,
+			1,
+			1000
+		);
+		camera.position.set( 40, 20, 40 );
+		camera.lookAt(new THREE.Vector3( 0, 7, 0 ));
+		scene.add( camera );
+	
+	
+//Table
+ table = new Physijs.PlaneMesh(
+	new THREE.BoxGeometry(25,1,25),
+	table_material,
+	0,
+	{ restitution: .2, friction: .8}
+	);
+	table.position.y = -.5;
+	table.receiveShadow = true;
+	scene.add(table);
+	
+		requestAnimationFrame( render );
+	};
+	
+	render = function() {
+		scene.simulate(); // run physics
+		renderer.render( scene, camera); // render the scene
+		requestAnimationFrame( render );
+	};
+	
+	window.onload = initScene();
+	
+	</script>
+</body>
+</html>
