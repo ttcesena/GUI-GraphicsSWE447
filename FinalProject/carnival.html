@@ -5,6 +5,8 @@
 	<script src="three.min.js"></script>
 	<script src="physi.js"></script>
 	<script src="OBJLoader.js"></script>
+	<script src="MTLLoader.js"></script>
+	<script src="OrbitControls.js"></script>
 	
 	
 	
@@ -20,7 +22,7 @@
 	Physijs.scripts.worker = 'physijs_worker.js';
 	Physijs.scripts.ammo = 'ammo.js';
 
-	var initScene, render, renderer, scene, camera, table, table_material, ball, ball_material,objLoader;
+	var initScene, render, renderer, scene, camera, table, table_material, ball, ball_material,textloader, objLoader, mtlLoader,controls;
 	
 	initScene = function() {
 		renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -28,7 +30,7 @@
 		document.getElementById( 'viewport' ).appendChild( renderer.domElement );
 		
 		scene = new Physijs.Scene ({ fixedTimeStep: 1 / 120});
-		
+//Camera
 		camera = new THREE.PerspectiveCamera(
 			35,
 			window.innerWidth / window.innerHeight,
@@ -46,20 +48,59 @@
 		camera.lookAt(new THREE.Vector3( 0, 7, 0 ));
 		scene.add( camera );
 		
-//Bottle
-/*objLoader = new THREE.OBJLoader();
-objLoader.load('models/Bottle.obj', function(object){
-	scene.add(object);
-	}
+//Orbit
+/*controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.25;
+controls.enableZoom = true;
+*/
+
+//Loader
+textloader = new THREE.TextureLoader();
+
+//Textures
+table_material = Physijs.createMaterial(
+	new THREE.MeshBasicMaterial({ map: textloader.load('textures/Wooden.jpg')}),
+	.9,
+	.2
 	);
-	*/
+	
+ball_material = Physijs.createMaterial(
+	new THREE.MeshBasicMaterial({ map: textloader.load('textures/Fuzzy.jpg')}),
+	.9,
+	.2
+	);
+
+
+		
+//Bottle
+mtlLoader = new THREE.MTLLoader();
+mtlLoader.load('models/bottle.mtl', function (materials) {
+
+    materials.preload();
+
+    var objLoader = new THREE.OBJLoader();
+    objLoader.setMaterials(materials);
+    var vscale = 5;
+    objLoader.load('models/bottle.obj', function (object) { 
+       object.scale.x = vscale;
+       object.scale.y = vscale;
+	   object.scale.z = vscale;
+
+        scene.add(object);
+        //object.position.y -= 60;
+
+
+    });
+
+});
+	
 
 //Table
  table = new Physijs.PlaneMesh(
 	new THREE.BoxGeometry(25,1,25),
-	new THREE.MeshBasicMaterial({
-		map:THREE.ImageUtils.loadTexture("textures/Wooden.jpg")}),
-	0,
+		table_material,
+		0,
 	{ restitution: .2, friction: .8}
 	);
 	table.position.y = -.5;
@@ -70,17 +111,16 @@ objLoader.load('models/Bottle.obj', function(object){
 	
 //Ball
  ball = new Physijs.SphereMesh(
- new THREE.SphereGeometry(2.5),
- new THREE.MeshBasicMaterial({
-	map:THREE.ImageUtils.loadTexture("textures/Stitch.jpg")}),
- 0
+ new THREE.SphereGeometry(2,5),
+ ball_material,
+ 0,
  );
- ball.position.y = 3;
+ ball.position.y = 6;
  ball.receiveShadow = true;
  scene.add(ball);
  
 	requestAnimationFrame(render);
-	};
+};
 	render = function() {
 		scene.simulate(); // run physics
 		renderer.render( scene, camera); // render the scene
