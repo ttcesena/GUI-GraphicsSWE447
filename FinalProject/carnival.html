@@ -47,19 +47,18 @@
 		scene.add( camera );
 		
 //Bottle
-objLoader = new THREE.OBJLoader();
+/*objLoader = new THREE.OBJLoader();
 objLoader.load('models/Bottle.obj', function(object){
 	scene.add(object);
 	}
 	);
-	
+	*/
 
-	
-	
 //Table
  table = new Physijs.PlaneMesh(
 	new THREE.BoxGeometry(25,1,25),
-	table_material,
+	new THREE.MeshBasicMaterial({
+		map:THREE.ImageUtils.loadTexture("textures/Wooden.jpg")}),
 	0,
 	{ restitution: .2, friction: .8}
 	);
@@ -72,7 +71,8 @@ objLoader.load('models/Bottle.obj', function(object){
 //Ball
  ball = new Physijs.SphereMesh(
  new THREE.SphereGeometry(2.5),
- ball_material,
+ new THREE.MeshBasicMaterial({
+	map:THREE.ImageUtils.loadTexture("textures/Stitch.jpg")}),
  0
  );
  ball.position.y = 3;
