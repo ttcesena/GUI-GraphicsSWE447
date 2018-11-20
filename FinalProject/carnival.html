@@ -7,6 +7,7 @@
 	<script src="OBJLoader.js"></script>
 	<script src="MTLLoader.js"></script>
 	<script src="OrbitControls.js"></script>
+	<script src="stats.js"></script>
 	
 	
 	
@@ -22,14 +23,33 @@
 	Physijs.scripts.worker = 'physijs_worker.js';
 	Physijs.scripts.ammo = 'ammo.js';
 
-	var initScene, render, renderer, scene, camera, table, table_material, ball, ball_material,textloader, objLoader, mtlLoader,controls;
+	var initScene, render, renderer, render_stats, physics_stats, scene, camera, table,
+	table_material, ball, ball_material,textloader, objLoader, am_light,
+	mtlLoader,controls;
 	
 	initScene = function() {
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMapSoft = true;
 		document.getElementById( 'viewport' ).appendChild( renderer.domElement );
+	
+	render_stats = new Stats();
+		render_stats.domElement.style.position = 'absolute';
+		render_stats.domElement.style.top = '1px';
+		render_stats.domElement.style.zIndex = 100;
+		document.getElementById( 'viewport' ).appendChild( render_stats.domElement );
+
+		physics_stats = new Stats();
+		physics_stats.domElement.style.position = 'absolute';
+		physics_stats.domElement.style.top = '50px';
+		physics_stats.domElement.style.zIndex = 100;
+		document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
 		
+//Create Scene
 		scene = new Physijs.Scene ({ fixedTimeStep: 1 / 120});
+		scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
+		
 //Camera
 		camera = new THREE.PerspectiveCamera(
 			35,
@@ -39,21 +59,25 @@
 		);
 		
 		camera = new THREE.PerspectiveCamera(
-			45,
+			40,
 			window.innerWidth / window.innerHeight,
 			1,
 			1000
 		);
-		camera.position.set( 40, 20, 40 );
+		camera.position.set( 25,20,25 );
 		camera.lookAt(new THREE.Vector3( 0, 7, 0 ));
 		scene.add( camera );
 		
+// ambient light
+		am_light = new THREE.AmbientLight( 0x444444 );
+		scene.add( am_light );
+		
 //Orbit
-/*controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.25;
 controls.enableZoom = true;
-*/
+
 
 //Loader
 textloader = new THREE.TextureLoader();
@@ -66,7 +90,7 @@ table_material = Physijs.createMaterial(
 	);
 	
 ball_material = Physijs.createMaterial(
-	new THREE.MeshBasicMaterial({ map: textloader.load('textures/Fuzzy.jpg')}),
+	new THREE.MeshPhongMaterial({ map: textloader.load('textures/Fuzzy.jpg')}),
 	.9,
 	.2
 	);
@@ -74,27 +98,20 @@ ball_material = Physijs.createMaterial(
 
 		
 //Bottle
-mtlLoader = new THREE.MTLLoader();
-mtlLoader.load('models/bottle.mtl', function (materials) {
+/*mtlLoader = new THREE.MTLLoader();
+mtlLoader.load('/models/bottle.mtl', function (materials) {
 
     materials.preload();
-
-    var objLoader = new THREE.OBJLoader();
-    objLoader.setMaterials(materials);
-    var vscale = 5;
-    objLoader.load('models/bottle.obj', function (object) { 
-       object.scale.x = vscale;
-       object.scale.y = vscale;
-	   object.scale.z = vscale;
-
+*/
+    objLoader = new THREE.OBJLoader();
+    //objLoader.setMaterials(materials);
+    objLoader.load('models/Bottle.obj', function (object) { 
+	   
         scene.add(object);
         //object.position.y -= 60;
+	});
 
 
-    });
-
-});
-	
 
 //Table
  table = new Physijs.PlaneMesh(
@@ -106,8 +123,6 @@ mtlLoader.load('models/bottle.mtl', function (materials) {
 	table.position.y = -.5;
 	table.receiveShadow = true;
 	scene.add(table);
-	
-		requestAnimationFrame( render );
 	
 //Ball
  ball = new Physijs.SphereMesh(
