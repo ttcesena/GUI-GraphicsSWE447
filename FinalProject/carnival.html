@@ -115,8 +115,8 @@ mtlLoader.load('/models/bottle.mtl', function (materials) {
 		bottle1.scale.y = .03;
 		bottle1.scale.z = .03;
 	    
-	    var bottle2 = bottle1.clone();
-	    var bottle3 = bottle1.clone();
+	    var bottle2 = new THREE.Mesh(bottle1);
+	    var bottle3 = new THREE.Mesh(bottle1);
 	    
 	    bottle2.position.x = 3;
 	    bottle3.position.z = 3;
