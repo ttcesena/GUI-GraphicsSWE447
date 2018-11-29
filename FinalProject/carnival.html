@@ -110,10 +110,10 @@ mtlLoader.load('/models/bottle.mtl', function (materials) {
 */
     objLoader = new THREE.OBJLoader();
     //objLoader.setMaterials(materials);
-    objLoader.load('models/Bottle.obj', function (bottle1) {
-		bottle1.scale.x = .03;
-		bottle1.scale.y = .03;
-		bottle1.scale.z = .03;
+    objLoader.load('models/Bottle.obj', function (object) {
+		object.scale.x = .03;
+		object.scale.y = .03;
+		object.scale.z = .03;
 	    
 	   /* var bottle2 = new THREE.Mesh(bottle1);
 	    var bottle3 = new THREE.Mesh(bottle1);
@@ -129,7 +129,7 @@ mtlLoader.load('/models/bottle.mtl', function (materials) {
 		bottle3.scale.y = .03;
 		bottle3.scale.z = .03;
 	    */
-	    scene.add(bottle1);
+	    scene.add(object);
 	   // scene.add(bottle2);
 	    //scene.add(bottle3);
 	
