@@ -8,6 +8,7 @@
 	<script src="MTLLoader.js"></script>
 	<script src="OrbitControls.js"></script>
 	<script src="stats.js"></script>
+	<script src="DragControls.js"></script>
 	
 	
 	
@@ -25,7 +26,9 @@
 
 	var initScene, render, renderer, render_stats, physics_stats, scene, camera, table,
 	table_material, ball, ball_material,textloader, objLoader, am_light,
-	mtlLoader,controls;
+	mtlLoader,controls, dragging;
+	
+	var objects = [];
 	
 	initScene = function() {
 		renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -48,15 +51,17 @@
 		
 //Create Scene
 		scene = new Physijs.Scene ({ fixedTimeStep: 1 / 120});
+		scene.background = new THREE.Color( 0xf0f0f0 );
 		scene.setGravity(new THREE.Vector3( 0, -30, 0 ));
+		scene.addEventListener(
+			'update',
+				function(){
+					scene.simulate( undefined,1);
+					physics_stats.update();
+					}
+					);
 		
 //Camera
-		camera = new THREE.PerspectiveCamera(
-			35,
-			window.innerWidth / window.innerHeight,
-			1,
-			1000
-		);
 		
 		camera = new THREE.PerspectiveCamera(
 			40,
@@ -69,7 +74,7 @@
 		scene.add( camera );
 		
 // ambient light
-		am_light = new THREE.AmbientLight( 0x444444 );
+		am_light = new THREE.AmbientLight( 0x505050 );
 		scene.add( am_light );
 		
 //Orbit
@@ -91,8 +96,8 @@ table_material = Physijs.createMaterial(
 	
 ball_material = Physijs.createMaterial(
 	new THREE.MeshPhongMaterial({ map: textloader.load('textures/Fuzzy.jpg')}),
-	.9,
-	.2
+	.4,
+	.4
 	);
 
 
@@ -105,10 +110,36 @@ mtlLoader.load('/models/bottle.mtl', function (materials) {
 */
     objLoader = new THREE.OBJLoader();
     //objLoader.setMaterials(materials);
-    objLoader.load('models/Bottle.obj', function (object) { 
-	   
-        scene.add(object);
-        //object.position.y -= 60;
+    objLoader.load('models/Bottle.obj', function (object) {
+		object.scale.x = .03;
+		object.scale.y = .03;
+		object.scale.z = .03;
+		/*var bottle1 = new THREE.Mesh(object, new THREE.MeshBasicMaterial({ color: 0xff0000});
+		var bottle2 = new THREE.Mesh(object, new THREE.MeshBasicMaterial({ color: 0xff0000});
+		var bottle3 = new THREE.Mesh(object, new THREE.MeshBasicMaterial({ color: 0xff0000});
+	
+		bottle1.scale.x = .03;
+		bottle1.scale.y = .03;
+		bottle1.scale.z = .03;
+		
+		bottle2.scale.x = .03;
+		bottle2.scale.y = .03;
+		bottle2.scale.z = .03;
+		
+		bottle3.scale.x = .03;
+		bottle3.scale.y = .03;
+		bottle3.scale.z = .03;
+		
+		bottle2.position.z = 3;
+		bottle3.position.x = 3;
+		
+		
+        scene.add(bottle1);
+		scene.add(bottle2);
+		scene.add(bottle3);
+		*/
+		scene.add(object);
+	
 	});
 
 
@@ -128,18 +159,33 @@ mtlLoader.load('/models/bottle.mtl', function (materials) {
  ball = new Physijs.SphereMesh(
  new THREE.SphereGeometry(2,5),
  ball_material,
- 0,
+ 0
  );
+
  ball.position.y = 6;
- ball.receiveShadow = true;
+ ball.position.z = 5;
+ ball.castShadow = true;
+
  scene.add(ball);
+ objects.push(ball);
  
 	requestAnimationFrame(render);
+
+
+	
+/*dragging = new THREE.DragControls(objects, camera, renderer.domElement);
+dragging.addEventListener('dragstart', function(){
+	controls.enabled = false;
+	} );
+dragging.addEventListener ('dragged', function(){
+	controls.enabled = true;
+	} ); */
 };
 	render = function() {
 		scene.simulate(); // run physics
 		renderer.render( scene, camera); // render the scene
 		requestAnimationFrame( render );
+		render_stats.update();
 	};
 	
 	window.onload = initScene();
