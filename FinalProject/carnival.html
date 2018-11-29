@@ -110,35 +110,28 @@ mtlLoader.load('/models/bottle.mtl', function (materials) {
 */
     objLoader = new THREE.OBJLoader();
     //objLoader.setMaterials(materials);
-    objLoader.load('models/Bottle.obj', function (object) {
-		object.scale.x = .03;
-		object.scale.y = .03;
-		object.scale.z = .03;
-		/*var bottle1 = new THREE.Mesh(object, new THREE.MeshBasicMaterial({ color: 0xff0000});
-		var bottle2 = new THREE.Mesh(object, new THREE.MeshBasicMaterial({ color: 0xff0000});
-		var bottle3 = new THREE.Mesh(object, new THREE.MeshBasicMaterial({ color: 0xff0000});
-	
+    objLoader.load('models/Bottle.obj', function (bottle1) {
 		bottle1.scale.x = .03;
 		bottle1.scale.y = .03;
 		bottle1.scale.z = .03;
-		
-		bottle2.scale.x = .03;
+	    
+	    var bottle2 = bottle1.clone();
+	    var bottle3 = bottle1.clone();
+	    
+	    bottle2.position.x = 3;
+	    bottle3.position.z = 3;
+	    
+	    	bottle2.scale.x = .03;
 		bottle2.scale.y = .03;
 		bottle2.scale.z = .03;
-		
-		bottle3.scale.x = .03;
+	    
+	    	bottle3.scale.x = .03;
 		bottle3.scale.y = .03;
 		bottle3.scale.z = .03;
-		
-		bottle2.position.z = 3;
-		bottle3.position.x = 3;
-		
-		
-        scene.add(bottle1);
-		scene.add(bottle2);
-		scene.add(bottle3);
-		*/
-		scene.add(object);
+	    
+	    scene.add(bottle1);
+	    scene.add(bottle2);
+	    scene.add(bottle3);
 	
 	});
 
