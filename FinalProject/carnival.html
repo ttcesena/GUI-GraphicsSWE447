@@ -9,45 +9,34 @@
 	<script src="OBJLoader.js"></script>
 	<script src="MTLLoader.js"></script>
 	<script src="TrackballControls.js"></script>
-	<script src="DragControls.js"></script>
 	<script src="stats.js"></script>
-	
-	
-	
-</head>
-
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <body>
+<center>
+<button id = "reset" onclick = "controls.reset()">Reset Camera</button>
+<button id = "reset" onclick = "history.go(0)" >Reset Scene</button>
+</center>
 	<div id="viewport"></div>
-
-<script>
-	
-	'use strict';
-	
-	Physijs.scripts.worker = 'physijs_worker.js';
-	Physijs.scripts.ammo = 'ammo.js';
-
+<script>	
 var camera, scene, renderer;
-var geometry, material;
+var geometry, material, ball;
 var raycaster, mouse, plane;
 var startPos, endPos;
 var $canvas;
-var balls =[];
+var balls;
 
 var render,render_stats,physics_stats,
 table,table_material,textloader,objLoader,
-mtlLoader,controls,ball,ball_material,light,bottle,bottle_material;
+mtlLoader,controls,ball_material,light,bottle,bottle_material;
 
 init();
+animate();
 
+document.ontouchmove = function(event) {
+  event.preventDefault();
+};
 
 function init() {
-
-	renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-	renderer.shadowMap.enabled = true;
-	renderer.shadowMapSoft = true;
-	document.getElementById( 'viewport' ).appendChild( renderer.domElement );
-		
 render_stats = new Stats();
 		render_stats.domElement.style.position = 'absolute';
 		render_stats.domElement.style.top = '1px';
@@ -59,29 +48,21 @@ render_stats = new Stats();
 		physics_stats.domElement.style.top = '50px';
 		physics_stats.domElement.style.zIndex = 100;
 		document.getElementById( 'viewport' ).appendChild( physics_stats.domElement );
-	
-		
 //Scene
-		scene = new Physijs.Scene({ fixedTimeStep: 1/120});
-		scene.setGravity(new THREE.Vector3( 0, -40, 0 ));
-		scene.addEventListener(
-			'update',
-			function(){
-					scene.simulate( undefined,1);
-					physics_stats.update();
-					}
-					);
+  scene = new Physijs.Scene({ fixedTimeStep: 1/120});
+		scene.setGravity(new THREE.Vector3( 0, -75, 0 ));
 //Camera
-		camera = new THREE.PerspectiveCamera(
-			60,
-			window.innerWidth / window.innerHeight,
-			1,
-			1000
-		);
-		camera.position.set(0,100,300);
-		camera.lookAt( scene.position );
-		scene.add( camera );
-		
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    1,
+    10000
+  );
+  camera.position.z = 300;
+  camera.position.y = 100;
+  camera.lookAt( scene.position );
+  scene.add(camera);
+  
 //TrackballControls
 	controls = new THREE.TrackballControls(camera);
 	controls.rotateSpeed = 1.0;
@@ -91,7 +72,7 @@ render_stats = new Stats();
 	controls.noPan = false;
 	controls.staticMoving = true;
 	controls.dynamicDampingFactor = 0.3;
-		
+	
 //Loader
 textloader = new THREE.TextureLoader();
 
@@ -131,7 +112,6 @@ textloader.load('textures/carnival_background.jpg',function(texture)
 {
 scene.background = texture;
 });
-
 //Custom Light Sources
 mtlLoader = new THREE.MTLLoader();
 	mtlLoader.load('models/LightSource.mtl', function(materials){
@@ -174,16 +154,20 @@ var objLoader3 = new THREE.OBJLoader();
 var light1 = new THREE.PointLight (0xFF0000,8,75);
 var light2 = new THREE.PointLight (0xFF0000,8,75);
 var light3 = new THREE.PointLight (0xFF0000,8,75);
+
 light1.position.z = 100;
 light2.position.z = 100;
 light3.position.z = 100;
 light2.position.x = 200;
 light3.position.x = -200;
+light1.position.y = 25;
+light2.position.y = 25;
+light3.position.y = 25;
+
 scene.add(light1);
 scene.add(light2);
 scene.add(light3);
 
-	
 //Tables
  table = new Physijs.BoxMesh(
 	new THREE.BoxGeometry(100,1,50),
@@ -215,11 +199,6 @@ var table6 = new Physijs.BoxMesh(
 		table_material,
 		0,
 	);
-var table7 = new Physijs.BoxMesh(
-	new THREE.BoxGeometry(70,1,25),
-		table_material,
-		0,
-	);
 	
 	table2.position.x = 200;
 	table3.position.x = -200;
@@ -229,7 +208,6 @@ var table7 = new Physijs.BoxMesh(
 	table4.position.z = 100;
 	table5.position.z = 100;
 	table6.position.z = 100;
-	table7.position.z = 175;
 	
 	table.receiveShadow = true;
 	table2.receiveShadow = true;
@@ -237,7 +215,6 @@ var table7 = new Physijs.BoxMesh(
 	table4.receiveShadow = true;
 	table5.receiveShadow = true;
 	table6.receiveShadow = true;
-	table7.receiveShadow = true;
 	
 	scene.add(table);
 	scene.add(table2);
@@ -245,7 +222,6 @@ var table7 = new Physijs.BoxMesh(
 	scene.add(table4);
 	scene.add(table5);
 	scene.add(table6);
-	scene.add(table7);
 	
 //Boxes
 var box1 = new Physijs.BoxMesh(
@@ -389,61 +365,79 @@ var bottle5 = new Physijs.CylinderMesh(
 	scene.add(bottle5);
 	
 //Ball
-ball = new Physijs.SphereMesh(
-	new THREE.SphereGeometry(10),
-	ball_material,
-	);
-var	ball2 = new Physijs.SphereMesh(
-	new THREE.SphereGeometry(10),
-	ball_material,
-	);
-var	ball3 = new Physijs.SphereMesh(
-	new THREE.SphereGeometry(10),
-	ball_material,
-	);
-	
-	ball.position.z = 175;
-	ball2.position.z = 175;
-	ball3.position.z = 175;
-	
-	ball2.position.x = 25;
-	ball3.position.x = -25;
-	
-	ball.position.y = 10;
-	ball2.position.y = 10;
-	ball3.position.y = 10;
-	
-	ball.castShadow = true;
-	ball2.castShadow = true;
-	ball3.castShadow = true;
-	
-	scene.add(ball);
-	scene.add(ball2);
-	scene.add(ball3);
-	balls.push(ball);
-	balls.push(ball2);
-	balls.push(ball3);
-	
-	var dragControls = new THREE.DragControls(balls, camera, renderer.domElement);
-	dragControls.addEventListener('dragstart', function(event) {
-		controls.enabled = false;
-	});
-	dragControls.addEventListener('dragend', function(event) {
-		controls.enabled = true;
-	});
-	
-		 render();
+  geometry = new THREE.SphereGeometry(10);
+  balls = [];
+
+  plane = new THREE.Plane(new THREE.Vector3(0, 0, -1), 0);
+
+  raycaster = new THREE.Raycaster();
+  startPos = new THREE.Vector2();
+  endPos = new THREE.Vector2();
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  document.body.appendChild(renderer.domElement);
+  $canvas = $("canvas");
+
+  $canvas.on("mousedown touchstart", function(event) {
+    if ("ontouchstart" in window) {
+      console.log(event.originalEvent.touches);
+      var cx = event.originalEvent.touches[0].clientX;
+      var cy = event.originalEvent.touches[0].clientY;
+    } else {
+      var cx = event.clientX;
+      var cy = event.clientY;
+    }
+    startPos.x = cx / window.innerWidth * 2 - 1;
+    startPos.y = -(cy / window.innerHeight) * 2 + 1;
+  });
+
+  $canvas.on("mouseup touchend", function(event) {
+    if ("ontouchstart" in window) {
+      console.log(event.originalEvent.touches);
+      var cx = event.originalEvent.changedTouches[0].clientX;
+      var cy = event.originalEvent.changedTouches[0].clientY;
+    } else {
+      var cx = event.clientX;
+      var cy = event.clientY;
+    }
+    endPos.x = cx / window.innerWidth * 2 - 1;
+    endPos.y = -(cy / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(endPos, camera);
+    var result = raycaster.ray.intersectPlane(plane);
+    ball = new Physijs.SphereMesh(geometry, ball_material);
+    ball.position.x = result.x;
+    ball.position.y = result.y;
+    ball.position.z = result.z;
+    ball.userData.dx = endPos.x - startPos.x;
+    ball.userData.dy = endPos.y - startPos.y;
+    balls.push(ball);
+    scene.add(ball);
+  });
 }
+
+function animate() {
+  requestAnimationFrame(animate);
+  for (var i = 0; i < balls.length; i++) {
+    var ball = balls[i];
+    ball.position.z -= 20;
+    ball.userData.dy -= 0.03;
+    ball.position.x += ball.userData.dx * 20;
+    ball.position.y += ball.userData.dy * 20;
+  }
+  render();
+  renderer.render(scene, camera);
+}
+
 
 function render() {
   scene.simulate();
-  renderer.render(scene, camera);
   requestAnimationFrame(render);
   controls.update();
-
+  
 }
 
-	
 </script>
 </body>
 </html>
